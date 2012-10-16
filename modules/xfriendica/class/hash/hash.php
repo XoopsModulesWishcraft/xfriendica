@@ -22,7 +22,7 @@
  *
  * @abstract
  */
-class FriendicaHash {
+class XFriendicaHash {
 	
 	// Child Checksum/Hash Storage
 	var $_class = array();
@@ -40,7 +40,10 @@ class FriendicaHash {
 	var $_options = array(	'md5'		=>	array(),
 							'sha1'		=>	array(),
 							'xoopscrc'	=>	array('seed'=>'ord(0)', 'length' => 28),
-							'password'	=>	array('seed'=>'ord(0)', 'length' => 12)		);
+							'password'	=>	array('seed'=>'ord(0)', 'length' => 12),
+							'guid'		=>	array('seed'=>'ord(0)', 'length' => 64),
+							'salt'		=>	array('seed'=>'ord(0)', 'length' => 128)
+					);
 		
 	private static $_vars = array(	'class' 	=>		array(),
 									'crc'		=>		'',
@@ -48,8 +51,10 @@ class FriendicaHash {
 									'options'	=>		array(	'md5'		=>	array(),
 																'sha1'		=>	array(),
 																'xoopscrc'	=>	array('seed'=>'ord(0)', 'length' => 28),
-																'password'	=>	array('seed'=>'ord(0)', 'length' => 12))
-							);
+																'password'	=>	array('seed'=>'ord(0)', 'length' => 12),
+																'guid'		=>	array('seed'=>'ord(0)', 'length' => 64),
+																'salt'		=>	array('seed'=>'ord(0)', 'length' => 128))
+														);
 	
     /**
      * Constructor
@@ -77,7 +82,7 @@ class FriendicaHash {
 	 * magic method for calling checksum types as a function
 	 *
 	 * ie.
-	 * 		$objsHash = new FriendicaHash();	// Instanciate the Object
+	 * 		$objsHash = new XFriendicaHash();	// Instanciate the Object
 	 * 		$objsHash->md5($data); 		// Returns MD5 Checksum
 	 * 		$objsHash->sha1($data); 		// Returns SHA1 Checksum
 	 *  	$objsHash->xoopscrc($data); 	// Returns XoopsCrc Checksum
@@ -97,10 +102,10 @@ class FriendicaHash {
 	 * magic method for calling checksum statically as types in function
 	 *
 	 * ie.
-	 * 		FriendicaHash::md5($data); 			// Returns MD5 Checksum
-	 * 		FriendicaHash::sha1($data); 		// Returns SHA1 Checksum
-	 *  	FriendicaHash::xoopscrc($data); 	// Returns XoopsCrc Checksum
-	 *   	FriendicaHash::password($data); 	// Returns Password Checksum
+	 * 		XFriendicaHash::md5($data); 			// Returns MD5 Checksum
+	 * 		XFriendicaHash::sha1($data); 		// Returns SHA1 Checksum
+	 *  	XFriendicaHash::xoopscrc($data); 	// Returns XoopsCrc Checksum
+	 *   	XFriendicaHash::password($data); 	// Returns Password Checksum
 	 *
 	 * @param string $type
 	 * @param array $args
@@ -136,7 +141,7 @@ class FriendicaHash {
 		if (is_object($this->_class[$type]))
 			return $this->_class[$type]->calc($data, $options);
 		else
-			$this->_errors[] = 'Error: FriendicaHash Class Not Set';
+			$this->_errors[] = 'Error: XFriendicaHash Class Not Set';
 		return false;
 	}
 
@@ -164,19 +169,19 @@ class FriendicaHash {
 	 */	
 	private function setType($type, $data, $options) {
 		if (file_exists(dirname(__FILE__).DS.$type.DS.$type.'.php')) {
-			if (!class_exists('FriendicaHash'.ucfirst($type)))
+			if (!class_exists('XFriendicaHash'.ucfirst($type)))
 				include_once(dirname(__FILE__).DS.$type.DS.$type.'.php');
-			$class = 'FriendicaHash'.ucfirst($type);
+			$class = 'XFriendicaHash'.ucfirst($type);
 			if (class_exists($class)) {
 				$this->_type = $type;
 				$this->_options[$type] = $options;
 				$this->_class[$type] = new $class($data, $options, $this);
 				return true;
 			} else {
-				$this->_errors[] = 'Error: FriendicaHash Child Class Does not Exist - '.$class.' missing.';
+				$this->_errors[] = 'Error: XFriendicaHash Child Class Does not Exist - '.$class.' missing.';
 			}
 		} else {
-			$this->_errors[] = 'Error: FriendicaHash Child Class Definition File Does not Exist - '.DS.$type.DS.$type.'.php missing.';
+			$this->_errors[] = 'Error: XFriendicaHash Child Class Definition File Does not Exist - '.DS.$type.DS.$type.'.php missing.';
 		}
 		return false;
 	}
@@ -192,7 +197,7 @@ class FriendicaHash {
 	private function setTypeStatic($type, $data, $options) {
 		if (file_exists(dirname(__FILE__).DS.$type.DS.$type.'.php')) {
 			include_once(dirname(__FILE__).DS.$type.DS.$type.'.php');
-			$class = 'FriendicaHash'.ucfirst($type).'Static';
+			$class = 'XFriendicaHash'.ucfirst($type).'Static';
 			if (class_exists($class)) {
 				return new $class($data, $options, null, 'static');
 			} 

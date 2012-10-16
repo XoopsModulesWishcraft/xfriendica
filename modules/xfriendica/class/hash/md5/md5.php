@@ -3,7 +3,7 @@
  * A md5 checksum wrapper class for hashing data.
  *
  */
-class XoopsHashMd5 extends XoopsHash
+class XFriendicaHashMd5 extends XFriendicaHash
 {
 	/**
 	 * function name and class typecast
@@ -24,7 +24,7 @@ class XoopsHashMd5 extends XoopsHash
 	var $_name = __CLASS__;
 	
 	/**
-	 * parent object from XoopsHash ($this)
+	 * parent object from XFriendicaHash ($this)
 	 *
 	 */
 	var $_parent = '';
@@ -84,7 +84,7 @@ class XoopsHashMd5 extends XoopsHash
  *
  * @abstract
  */
-class XoopsHashMd5Static extends XoopsHashMd5
+class XFriendicaHashMd5Static extends XFriendicaHashMd5
 {
 		function __construct($data, $options, $parent, $mode = 'inhertit') {
 			return parent::__construct($data, $options, $parent, 'static');

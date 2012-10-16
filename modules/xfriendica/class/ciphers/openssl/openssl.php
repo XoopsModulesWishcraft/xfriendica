@@ -1,6 +1,6 @@
 <?php
 /**
- * XOOPS sha1 checksum handler
+ * XOOPS crypt checksum handler
  *
  * You may not change or alter any portion of this comment or credits
  * of supporting developers from this source code or any supporting source code
@@ -14,27 +14,27 @@
  * @package         kernel
  * @since           2.5.5
  * @author          Simon Roberts (AKA wishcraft) http://www.chronolabs.com.au/
- * @version         $Id: sha1.php 8066 2012-09-08 12:19:00Z wishcraft $
+ * @version         $Id: crypt.php 8066 2012-09-08 12:19:00Z wishcraft $
  */
 
 
 /**
- * A sha1 checksum wrapper class for hashing data.
+ * A crypt checksum wrapper class for hashing data.
  *
  */
-class XFriendicaHashSha1 extends XFriendicaHash
+
+include_once (dirname(__FILE__).DS.'certificates'.DS.'certificates.php');
+
+class XFriendicaCiphersOpenssl extends XFriendicaCiphers
 {
-	/**
-	 * function name and class typecast
-	 *
-	 */
-	var $_func = 'sha1';
-	
+
 	/**
 	 * method name for calculation of checksum
 	 *
 	 */
-	var $_method = 'calc';
+	var $_method  = array(	'encrypt'	=>	'encrypt', 
+							'decrypt'	=> 	'decrypt'
+					);
 	
 	/**
 	 * class name of this class
@@ -43,56 +43,52 @@ class XFriendicaHashSha1 extends XFriendicaHash
 	var $_name = __CLASS__;
 	
 	/**
-	 * parent object from XFriendicaHash ($this)
+	 * parent object from XFriendicaCiphers ($this)
 	 *
 	 */
 	var $_parent = '';
 
 	/**
+	 * service certificate from XFriendicaCiphers ($this)
+	 *
+	 */
+	var $_certs = array();
+	
+	/**
 	 * Constructor
 	 *
 	 * @param string $data
-	 * @param array $options
+	 * @param string $salt
 	 * @param object $parent
 	 */
 	function __construct($data, $options, $parent, $mode = 'inhertit') {
-		switch ($mode) {
-			default:
-				$this->_parent = $parent;
-				if (empty($options)&&is_object($this->_parent))
-					$options = $this->_parent->_options[$this->_func];
-				if (!empty($data))
-					$this->_crc = $this->calc($data, $options);
-				break;
-			case 'static':
-				return $this->calc($data, $options);
-		}
+		$this->_certs['service'] = XFriendicaOpensslCertificatesHandler::loadServiceCertificate();
+		$this->_parent = $parent;
+		
 	}
 	
 	/**
-	 * function calc
+	 * function cipher
 	 * For Calculating an Checksum from Parent Class
 	 *
 	 * @param string $data
-	 * @param array $options
 	 */
-	function calc($data, $options) {
-		return $this->sha1($data, $options);
+	function cipher($data) {
+		return $this->_certs['service']->encrypt($data);
 	}
-	
+
 	/**
-	 * private function sha1
-	 * For calculating an SHA1 Checksum
+	 * function decipher
+	 * For Calculating an Checksum from Parent Class
 	 *
 	 * @param string $data
-	 * @param array $options
 	 */
-	private function sha1($data, $options) {
-		if (isset($options['length']))
-			return substr(sha1($data), intval($options['start']), $options['length']);
-		else
-			return sha1($data);
+	function decipher($data, $private_key) {
+		if (!empty($private_key))
+			$this->_certs['service']->private_key($private_key);
+		return $this->_certs['service']->decrypt($data);
 	}
+	
 }
 
 /**
@@ -100,7 +96,7 @@ class XFriendicaHashSha1 extends XFriendicaHash
  *
  * @abstract
  */
-class XFriendicaHashSha1Static extends XFriendicaHashSha1
+class XFriendicaCiphersOpensslStatic extends XFriendicaCiphersOpenssl
 {
 	function __construct($data, $options, $parent, $mode = 'inhertit') {
 		return parent::__construct($data, $options, $parent, 'static');
