@@ -27,7 +27,7 @@ include_once dirname(dirname(__FILE__)).'/xoopscrc/xoopscrc.php';
  * A password checksum wrapper class for hashing data.
  *
  */
-class XFriendicaHashPassword extends XFriendicaHashXFriendicacrc
+class XFriendicaHashGuid extends XFriendicaHashXFriendicacrc
 {
 
 	/**
@@ -38,7 +38,7 @@ class XFriendicaHashPassword extends XFriendicaHashXFriendicacrc
 	 * @param object $parent
 	 */
 	function __construct($data, $options, $parent, $mode = 'inhertit') {
-		$this->_func = 'password';
+		$this->_func = 'guid';
 		$this->_name = __CLASS__;	
 		return parent::__construct($data, $options, $parent, $mode);
 	}
@@ -53,35 +53,35 @@ class XFriendicaHashPassword extends XFriendicaHashXFriendicacrc
 	function calc($data, $options) {
 		if (empty($options)&&is_object($this->_parent))
 			$options = $this->_parent->_options[$this->_func];
-		return $this->password($data, $options);
+		return $this->guid($data, $options);
 	}
 	
 	/**
 	 * private function password
-	 * For calculating an Password Checksum
+	 * For calculating an Guid Checksum
 	 *
 	 * @param string $data
 	 * @param array $options
 	 */
-	private function password($data, $options) {
+	private function guid($data, $options) {
 		if (empty($options)&&is_object($this->_parent))
 			$options = $this->_parent->_options[$this->_func];
 		if (!isset($options['seed'])) {
 			if(is_numeric($this->_parent->_options[$this->_func]['seed'])&&$this->_parent->_options[$this->_func]['seed']<255)
 				$options['seed'] = $this->_parent->_options[$this->_func]['seed'];
 			else
-				$options['seed'] = ord(substr($data, 0, 1));
+				$options['seed'] = ord(substr($data, strlen($data)-1, 1));
 		} elseif (!is_numeric($options['seed'])) {
-			$options['seed'] = ord(substr($data, 0, 1));
+			$options['seed'] = ord(substr($data, strlen($data)-1, 1));
 		}
 		if (!isset($options['length'])) {
 			if(is_numeric($this->_parent->_options[$this->_func]['length'])&&$this->_parent->_options[$this->_func]['length']>1)
 				$options['length'] = $this->_parent->_options[$this->_func]['length'];
 			else
-				$options['length'] = 12;
+				$options['length'] = 64;
 		}
 		set_time_limit(120);
-		$crc = new $this->_class($data, $options['seed'], $options['length']);
+		$crc = new $this->_class($options['salt'].$data, $options['seed'], $options['length']);
 		return $crc->crc;
 	}		
 }
@@ -91,7 +91,7 @@ class XFriendicaHashPassword extends XFriendicaHashXFriendicacrc
  *
  * @abstract
  */
-class XFriendicaHashPasswordStatic extends XFriendicaHashPassword
+class XFriendicaHashGuidStatic extends XFriendicaHashGuid
 {
 	function __construct($data, $options, $parent, $mode = 'inhertit') {
 		return parent::__construct($data, $options, $parent, 'static');

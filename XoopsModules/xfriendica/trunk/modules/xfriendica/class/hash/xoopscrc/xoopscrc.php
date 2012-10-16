@@ -26,7 +26,7 @@ include_once dirname(__FILE__).'/xoops.crc.class.php';
  * A xoops checksum wrapper class for hashing data.
  *
  */
-class XoopsHashXoopscrc extends XoopsHash
+class XFriendicaHashXFriendicacrc extends XFriendicaHash
 {
 	/**
 	 * function name and class typecast
@@ -47,7 +47,7 @@ class XoopsHashXoopscrc extends XoopsHash
 	var $_name = __CLASS__;
 	
 	/**
-	 * parent object from XoopsHash ($this)
+	 * parent object from XFriendicaHash ($this)
 	 *
 	 */
 	var $_parent = '';
@@ -94,7 +94,7 @@ class XoopsHashXoopscrc extends XoopsHash
 	
 	/**
 	 * private function xoopscrc
-	 * For calculating an XoopsCrc Checksum
+	 * For calculating an XFriendicaCrc Checksum
 	 *
 	 * @param string $data
 	 * @param array $options
@@ -127,7 +127,7 @@ class XoopsHashXoopscrc extends XoopsHash
  *
  * @abstract
  */
-class XoopsHashXoopscrcStatic extends XoopsHashXoopscrc
+class XFriendicaHashXFriendicacrcStatic extends XFriendicaHashXFriendicacrc
 {
 	function __construct($data, $options, $parent, $mode = 'inhertit') {
 		return parent::__construct($data, $options, $parent, 'static');
